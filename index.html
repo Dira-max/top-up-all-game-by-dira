@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Top Up All Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+    }
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background: #25D366;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #128C7E;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Top Up Game</h1>
+    <form id="topupForm">
+      <label>Nama:</label>
+      <input type="text" id="nama" required>
+
+      <label>ID Game:</label>
+      <input type="text" id="idgame" required>
+
+      <label>Pilih Game:</label>
+      <select id="game" required onchange="updateDiamondList()">
+        <option value="">-- Pilih Game --</option>
+        <option value="Free Fire">Free Fire</option>
+        <option value="Mobile Legends">Mobile Legends</option>
+        <option value="PUBG Mobile">PUBG Mobile</option>
+      </select>
+
+      <label>Pilih Nominal Diamond:</label>
+      <select id="diamond" required>
+        <option value="">-- Pilih Nominal --</option>
+      </select>
+
+      <label>Metode Pembayaran:</label>
+      <select id="pembayaran" required>
+        <option value="Dana">Dana</option>
+        <option value="OVO">OVO</option>
+        <option value="Gopay">Gopay</option>
+        <option value="QRIS">QRIS</option>
+      </select>
+
+      <label>Upload Bukti Transfer:</label>
+      <input type="file" id="bukti" accept="image/*" required>
+
+      <button type="submit">Kirim ke WhatsApp</button>
+    </form>
+  </div>
+
+  <script>
+    const diamondOptions = {
+      "Free Fire": [
+        "5 Diamond - Rp 1.500",
+        "12 Diamond - Rp 3.000",
+        "50 Diamond - Rp 8.000",
+        "100 Diamond - Rp 16.000",
+        "140 Diamond - Rp 20.000",
+        "210 Diamond - Rp 33.000",
+        "355 Diamond - Rp 50.000",
+        "425 Diamond - Rp 60.000",
+        "500 Diamond - Rp 70.000",
+        "720 Diamond - Rp 100.000",
+        "1050 Diamond - Rp 150.000",
+        "Membership Mingguan - Rp 32.000",
+        "Membership Bulanan - Rp 100.000"
+        
+      ],
+      "Mobile Legends": [
+        "3 Diamond - Rp 3.000",
+        "20 Diamond - Rp 8.000",
+        "54 Diamond - Rp 18.000",
+        "88 Diamond - Rp 27.000",
+        "148 Diamond - Rp 45.000",
+        "170 Diamond - Rp 53.000",
+        "184 Diamond - Rp 57.000",
+        "240 Diamond - Rp 75.000",
+        258" Diamond - Rp 80.000",
+        "Starlight Member - Rp 100.000",
+        "Weekly Diamond Pas - Rp 30.000"
+        "Weekly Diamond Pas 2x - Rp 60.000"
+        "Weekly Diamond Pas 3x - Rp 90.000"
+        "Weekly Diamond Pas 4x - Rp 120.000"
+        "Weekly Diamond Pas 5x - Rp 155.000"
+        
+      ],
+      "PUBG Mobile": [
+        "60 UC - Rp 17.000",
+        "120 UC - Rp 34.000",
+        "180 UC - Rp 55.000",
+        "240 UC - Rp 65.000",
+        "325 UC - Rp 80.000",
+        "385 UC - Rp 95.000",
+        "Royale Pass - Rp 170.000",
+        "Elite Pass Plus - Rp 400.000"
+        
+      ]
+    };
+
+    function updateDiamondList() {
+      const game = document.getElementById("game").value;
+      const diamondSelect = document.getElementById("diamond");
+      diamondSelect.innerHTML = "<option value=''>-- Pilih Nominal --</option>";
+
+      if (diamondOptions[game]) {
+        diamondOptions[game].forEach(option => {
+          const el = document.createElement("option");
+          el.value = option;
+          el.textContent = option;
+          diamondSelect.appendChild(el);
+        });
+      }
+    }
+
+    document.getElementById("topupForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const nama = document.getElementById("nama").value;
+      const idgame = document.getElementById("idgame").value;
+      const game = document.getElementById("game").value;
+      const diamond = document.getElementById("diamond").value;
+      const pembayaran = document.getElementById("pembayaran").value;
+      const bukti = document.getElementById("bukti").files[0];
+      const adminNumber = "6281234567890";
+      const imgbbKey = "6770bf49c86db0e1d9dfe512091e8e79";
+
+      if (!bukti) return alert("Upload bukti transfer terlebih dahulu.");
+
+      const reader = new FileReader();
+      reader.onloadend = function () {
+        const base64 = reader.result.split(",")[1];
+        const formData = new FormData();
+        formData.append("image", base64);
+
+        fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+          method: "POST",
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const imgURL = data.data.url;
+            const msg = `*ORDER TOP UP GAME*
+
+` +
+              `Nama: ${nama}
+` +
+              `Game: ${game}
+` +
+              `ID Game: ${idgame}
+` +
+              `Nominal: ${diamond}
+` +
+              `Pembayaran: ${pembayaran}
+` +
+              `Bukti Transfer: ${imgURL}
+
+` +
+              `Harap tunggu konfirmasi admin.`;
+
+            window.open(`https://wa.me/${adminNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+          } else {
+            alert("Gagal upload bukti transfer.");
+          }
+        })
+        .catch(() => alert("Gagal menghubungi server upload."));
+      };
+
+      reader.readAsDataURL(bukti);
+    });
+  </script>
+</body>
+</html>
